@@ -37,7 +37,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Attack_Command =        x => AttackCommand(x.stringInfo, (int)x.floatInfo[0]);
     public static Action<PacketBase> action_Select_Command =        x => SelectCommand(x.stringInfo);
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
-    public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0], x.networkInfo[0]);
+    public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -83,8 +83,8 @@ public class ConfigPackets {
         foreach (var item in units)
             print("old school moving unit " + item + " to pos " + pos);
     }
-    public static void BasicMessageCommand(string msg, NetworkInstanceId nid)
+    public static void BasicMessageCommand(string msg)
     {
-        print("recibo un mensaje de " + nid.Value );
+        print("recibo un mensaje " );
     }
 }

@@ -16,6 +16,10 @@ public class PlayerExample : MonoBehaviour
         //if (Input.GetKeyDown(KeyCode.F))
         //    new PacketBase(PacketIDs.Old_School_Command).Add("Old_School_Move/14,7,8,9,25,4,77-12,24,32").Send();
 
-        
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("Enviando");
+            new PacketBase(PacketIDs.BasicMessage).Add("Este es El Mensaje").Send();
+        }
     }
 }

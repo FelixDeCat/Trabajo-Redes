@@ -38,7 +38,11 @@ public class MultiplayerManager : MonoBehaviour {
         AddPacketActions();
         myClient.Connect("127.0.0.1", 8080);
     }
-	void AddPacketActions()
+    private void OnConnectedToServer()
+    {
+        Debug.Log("Estoy Conectado");
+    }
+    void AddPacketActions()
     {
         if(connectionType == ConnectionType.Server)
             for (short i = 1000; i < 1000+(short)PacketIDs.Count; i++)

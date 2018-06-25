@@ -55,7 +55,6 @@ public class Player : NetworkBehaviour
     int maxBullets = 3;
     int currentBullets;
 
-
     void Start()
     {
         //if (!hasAuthority) enabled = false;
@@ -116,11 +115,7 @@ public class Player : NetworkBehaviour
     bool oneshot2;
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            Debug.Log("Enviando");
-            new PacketBase(PacketIDs.BasicMessage).Add("Este es El Mensaje").Add(netId).Send();
-        }
+        
 
         if (isServer) RutinaTimer();
         if (!hasAuthority) return;
