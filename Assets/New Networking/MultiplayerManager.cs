@@ -38,10 +38,16 @@ public class MultiplayerManager : MonoBehaviour {
         AddPacketActions();
         myClient.Connect("127.0.0.1", 8080);
     }
+
+    private void OnPlayerConnected(NetworkPlayer player)
+    {
+        Debug.Log("el player es: " + player.ipAddress);
+    }
     private void OnConnectedToServer()
     {
         Debug.Log("Estoy Conectado");
     }
+
     void AddPacketActions()
     {
         if(connectionType == ConnectionType.Server)
