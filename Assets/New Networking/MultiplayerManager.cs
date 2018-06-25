@@ -37,12 +37,36 @@ public class MultiplayerManager : MonoBehaviour {
         myClient = new NetworkClient();
         AddPacketActions();
         myClient.Connect("127.0.0.1", 8080);
+
+        Invoke("ConectClient", 0.1f);
+    }
+
+    void ConectClient() {
+        Console.WriteLine("ConectClient");
+        new PacketBase(PacketIDs.ConnectToServer).Add(connectionID.ToString()).Send();
+    }
+
+    public void PlayerConnected(string id)
+    {
+        Console.WriteLine("El player " + id + " se ha conectado");
+        Debug.Log("El player " + id + " se ha conectado");
+    }
+
+    private void OnPlayerDisconnected(NetworkPlayer player)
+    {
+        Console.WriteLine("On Player Disconnected");
     }
 
     private void OnPlayerConnected(NetworkPlayer player)
     {
-        Debug.Log("el player es: " + player.ipAddress);
+        Console.WriteLine("On Player Connected");
     }
+
+    private void OnDisconnectedFromServer(NetworkDisconnection info)
+    {
+        Console.WriteLine("Disconnected fron Server");
+    }
+
     private void OnConnectedToServer()
     {
         Debug.Log("Estoy Conectado");

@@ -17,6 +17,7 @@ using UnityEngine.Networking;
 // [paso 1] Agregar el enum
 public enum PacketIDs : short
 {
+    ConnectToServer,
     Move_Command,
     Attack_Command,
     Select_Command,
@@ -38,6 +39,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Select_Command =        x => SelectCommand(x.stringInfo);
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
+    public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer(x.stringInfo[0]);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -49,6 +51,7 @@ public class ConfigPackets {
         packetActions.Add(PacketIDs.Select_Command,     action_Select_Command);
         packetActions.Add(PacketIDs.Old_School_Command, action_Old_School_Command);
         packetActions.Add(PacketIDs.BasicMessage,       action_basicMessage_Command);
+        packetActions.Add(PacketIDs.ConnectToServer,    action_ConnectServer);
     }
 
     // [paso 4] Crear la funcion a la cual le asignamos al Action
@@ -56,6 +59,11 @@ public class ConfigPackets {
     ///////////////////////////////////////////////////////////////////////////////////
     /// TODAS LAS FUNCIONES QUE VAN A EJECUTAR LOS ACTIONS CUANDO RECIBO UN PACKET
     ///////////////////////////////////////////////////////////////////////////////////
+    public static void ConnectToServer(string _id)
+    {
+        Console.WriteLine("On Packet Received");
+        GameObject.FindObjectOfType<MultiplayerManager>().PlayerConnected(_id);
+    }
     public static void MoveCommand(string[] units, Vector3 pos)
     {
         string[] ids = units[0].Split(',');
