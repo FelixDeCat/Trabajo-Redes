@@ -6,7 +6,7 @@ using System.Linq;
 
 // ¿como se usa?
 
-// primero seguir los pasos 1,2,3,4,5 de esta clases
+// primero seguir los pasos 1,2,3,4,5 de esta clase
 
 // luego desde afuera para usarlo hay que crear un PacketBase
 // asignarle por constructor el "PacketIDs", por ejemplo.  new PacketBase(PacketIDs.BlaBlaBlaCommand)
