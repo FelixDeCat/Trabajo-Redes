@@ -118,6 +118,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
+            Debug.Log("Enviando");
             new PacketBase(PacketIDs.BasicMessage).Add("Este es El Mensaje").Add(netId).Send();
         }
 
