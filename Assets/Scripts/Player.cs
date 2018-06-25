@@ -75,6 +75,8 @@ public class Player : NetworkBehaviour
 
     void FixedUpdate()
     {
+        
+
         if (!hasAuthority) return;
         if (canMove)
         {
@@ -115,8 +117,6 @@ public class Player : NetworkBehaviour
     bool oneshot2;
     private void Update()
     {
-        
-
         if (isServer) RutinaTimer();
         if (!hasAuthority) return;
         Shoot();
