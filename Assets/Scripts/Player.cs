@@ -123,9 +123,6 @@ public class Player : NetworkBehaviour
         CmdCheckIfEstanTodos();
     }
 
-
-
-
     float timerBullet;
     public void Shoot()
     {
