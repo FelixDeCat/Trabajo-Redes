@@ -75,8 +75,6 @@ public class Player : NetworkBehaviour
 
     void FixedUpdate()
     {
-        
-
         if (!hasAuthority) return;
         if (canMove)
         {
