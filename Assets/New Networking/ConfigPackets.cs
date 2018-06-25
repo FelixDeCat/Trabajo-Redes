@@ -4,27 +4,47 @@ using UnityEngine;
 using System;
 using System.Linq;
 
+// ¿como se usa?
+
+// primero seguir los pasos 1,2,3,4,5 de esta clases
+
+// luego desde afuera para usarlo hay que crear un PacketBase
+// asignarle por constructor el "PacketIDs", por ejemplo.  new PacketBase(PacketIDs.BlaBlaBlaCommand)
+// luego ir agregandole datos con .Add(blablabla)
+// y NO OLVIDAR cerrarlo con .Send()
+
+// [paso 1] Agregar el enum
 public enum PacketIDs : short { Move_Command, Attack_Command, Select_Command, Old_School_Command, lalala, Count }
 
 public class ConfigPackets {
 
-    public Dictionary<PacketIDs, Action<PacketBase>> packetActions = new Dictionary<PacketIDs, Action<PacketBase>>();
-
     static void print(object p) { Debug.Log(p.ToString()); }
 
+    public Dictionary<PacketIDs, Action<PacketBase>> packetActions = new Dictionary<PacketIDs, Action<PacketBase>>();
+
+    // [paso 2] Crear el Action 
+    // [paso 5] rellenar el action con la funcion correspondiente
     public static Action<PacketBase> Move_Command = x => MoveCommand(x.stringInfo, x.vectorInfo[0]);
     public static Action<PacketBase> Attack_Command = x => AttackCommand(x.stringInfo, (int)x.floatInfo[0]);
     public static Action<PacketBase> Select_Command = x => SelectCommand(x.stringInfo);
     public static Action<PacketBase> Old_School_Command = x => Move(x.stringInfo[0]);
 
+    // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
     {
+        //Relleno el diccionario con algo...
+        //Esto se Ejecuta en el MultiplayerManager cuando el jugador selecciono "Server" o "Client"
         packetActions.Add(PacketIDs.Move_Command, Move_Command);
         packetActions.Add(PacketIDs.Attack_Command, Attack_Command);
         packetActions.Add(PacketIDs.Select_Command, Select_Command);
         packetActions.Add(PacketIDs.Old_School_Command, Old_School_Command);
     }
 
+    // [paso 4] Crear la funcion a la cual le asignamos al Action
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    /// TODAS LAS FUNCIONES QUE VAN A EJECUTAR LOS ACTIONS CUANDO RECIBO UN PACKET
+    ///////////////////////////////////////////////////////////////////////////////////
     public static void MoveCommand(string[] units, Vector3 pos)
     {
         string[] ids = units[0].Split(',');
