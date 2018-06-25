@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.Networking;
 
 // ¿como se usa?
 
@@ -14,7 +15,15 @@ using System.Linq;
 // y NO OLVIDAR cerrarlo con .Send()
 
 // [paso 1] Agregar el enum
-public enum PacketIDs : short { Move_Command, Attack_Command, Select_Command, Old_School_Command, lalala, Count }
+public enum PacketIDs : short
+{
+    Move_Command,
+    Attack_Command,
+    Select_Command,
+    Old_School_Command,
+    BasicMessage,
+    Count
+}
 
 public class ConfigPackets {
 
@@ -24,20 +33,22 @@ public class ConfigPackets {
 
     // [paso 2] Crear el Action 
     // [paso 5] rellenar el action con la funcion correspondiente
-    public static Action<PacketBase> Move_Command = x => MoveCommand(x.stringInfo, x.vectorInfo[0]);
-    public static Action<PacketBase> Attack_Command = x => AttackCommand(x.stringInfo, (int)x.floatInfo[0]);
-    public static Action<PacketBase> Select_Command = x => SelectCommand(x.stringInfo);
-    public static Action<PacketBase> Old_School_Command = x => Move(x.stringInfo[0]);
+    public static Action<PacketBase> action_Move_Command =          x => MoveCommand(x.stringInfo, x.vectorInfo[0]);
+    public static Action<PacketBase> action_Attack_Command =        x => AttackCommand(x.stringInfo, (int)x.floatInfo[0]);
+    public static Action<PacketBase> action_Select_Command =        x => SelectCommand(x.stringInfo);
+    public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
+    public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0], x.networkInfo[0]);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
     {
         //Relleno el diccionario con algo...
         //Esto se Ejecuta en el MultiplayerManager cuando el jugador selecciono "Server" o "Client"
-        packetActions.Add(PacketIDs.Move_Command, Move_Command);
-        packetActions.Add(PacketIDs.Attack_Command, Attack_Command);
-        packetActions.Add(PacketIDs.Select_Command, Select_Command);
-        packetActions.Add(PacketIDs.Old_School_Command, Old_School_Command);
+        packetActions.Add(PacketIDs.Move_Command,       action_Move_Command);
+        packetActions.Add(PacketIDs.Attack_Command,     action_Attack_Command);
+        packetActions.Add(PacketIDs.Select_Command,     action_Select_Command);
+        packetActions.Add(PacketIDs.Old_School_Command, action_Old_School_Command);
+        packetActions.Add(PacketIDs.BasicMessage,       action_basicMessage_Command);
     }
 
     // [paso 4] Crear la funcion a la cual le asignamos al Action
@@ -71,5 +82,9 @@ public class ConfigPackets {
         Vector3 pos = new Vector3(float.Parse(vector[0]), float.Parse(vector[1]), float.Parse(vector[2]));
         foreach (var item in units)
             print("old school moving unit " + item + " to pos " + pos);
+    }
+    public static void BasicMessageCommand(string msg, NetworkInstanceId nid)
+    {
+        print("recibo un mensaje de " + nid.Value );
     }
 }

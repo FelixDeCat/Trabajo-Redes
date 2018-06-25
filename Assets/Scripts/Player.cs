@@ -116,11 +116,18 @@ public class Player : NetworkBehaviour
     bool oneshot2;
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            new PacketBase(PacketIDs.BasicMessage).Add("Este es El Mensaje").Add(netId).Send();
+        }
+
         if (isServer) RutinaTimer();
         if (!hasAuthority) return;
         Shoot();
         CmdCheckIfEstanTodos();
     }
+
+
 
 
     float timerBullet;
