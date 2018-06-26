@@ -15,6 +15,7 @@ public class MultiplayerManager : MonoBehaviour {
     public static MultiplayerManager instance;
     public ConfigPackets packetConfigurer = new ConfigPackets();
     public enum ConnectionType { None, Server, Client, Both }
+    public List<NewPlayer> players = new List<NewPlayer>();
     private void Awake() { instance = this; }
     private void OnGUI()
     {
@@ -32,7 +33,6 @@ public class MultiplayerManager : MonoBehaviour {
         NetworkServer.Listen(8080);
         myClient = ClientScene.ConnectLocalServer();
 
-        Invoke("ConectClient", 0.1f);
     }
     public void SetupClient() {
         connectionType = ConnectionType.Client;
@@ -43,11 +43,10 @@ public class MultiplayerManager : MonoBehaviour {
         Invoke("ConectClient", 0.1f);
     }
 
-    public List<NewPlayer> players = new List<NewPlayer>(); 
-
+    //si soy cliente envio mi conection ID
     void ConectClient() {
         Console.WriteLine("ConectClient");
-        new PacketBase(PacketIDs.ConnectToServer).Add(connectionID.ToString()).Send(true);
+        new PacketBase(PacketIDs.ConnectToServer).Add("Connection ID: " + myClient.connection.connectionId).Send();
     }
 
     public void PlayerConnected(string id)
@@ -66,26 +65,6 @@ public class MultiplayerManager : MonoBehaviour {
 
         new PacketBase(PacketIDs.BasicMessage).Add("A TODOS").Send();
         
-    }
-
-    private void OnPlayerDisconnected(NetworkPlayer player)
-    {
-        Console.WriteLine("On Player Disconnected");
-    }
-
-    private void OnPlayerConnected(NetworkPlayer player)
-    {
-        Console.WriteLine("On Player Connected");
-    }
-
-    private void OnDisconnectedFromServer(NetworkDisconnection info)
-    {
-        Console.WriteLine("Disconnected fron Server");
-    }
-
-    private void OnConnectedToServer()
-    {
-        Debug.Log("Estoy Conectado");
     }
 
     void AddPacketActions()
