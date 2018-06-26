@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
     public LayerMask layer_Floor;
     public LayerMask layer_Enemy;
 
-    public Player TheAutority;
+    public NewPlayer TheAutority;
 
     public GameObject bullet;
     public GameObject pantalla_de_espera;

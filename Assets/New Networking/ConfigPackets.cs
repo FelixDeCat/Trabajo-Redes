@@ -25,6 +25,13 @@ public enum PacketIDs : short
     Old_School_Command,
     BasicMessage,
     allCanMove,
+
+    Cmd_MyPosToServer,
+    Rpc_PosForAll,
+
+    Cmd_Shoot,
+    Rpc_InstBullet,
+
     Count
 }
 
@@ -44,20 +51,32 @@ public class ConfigPackets {
     public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer((int)x.floatInfo[0]);
     public static Action<PacketBase> action_Instantiate =           x => InstantiateClients(x.stringInfo[0]);
     public static Action<PacketBase> action_AllCanMove =            x => AllCanMove();
+    //to server
+    public static Action<PacketBase> action_MyPosToServer =         x => Server_ReceivePositionForUpdate(x.stringInfo[0],x.vectorInfo[0]);
+    public static Action<PacketBase> action_Shoot =                 x => Server_ReceiveShoot(x.stringInfo[0]);
+    //to client
+    public static Action<PacketBase> action_ServerSendMeAPosition = x => Client_ReceivePositionForUpdate(x.stringInfo[0],x.vectorInfo[0]);
+    public static Action<PacketBase> action_instbullet =            x => Client_InstShoot(x.stringInfo[0]);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
     {
         //Relleno el diccionario con algo...
         //Esto se Ejecuta en el MultiplayerManager cuando el jugador selecciono "Server" o "Client"
-        packetActions.Add(PacketIDs.Move_Command,       action_Move_Command);
-        packetActions.Add(PacketIDs.Attack_Command,     action_Attack_Command);
-        packetActions.Add(PacketIDs.Select_Command,     action_Select_Command);
-        packetActions.Add(PacketIDs.Old_School_Command, action_Old_School_Command);
-        packetActions.Add(PacketIDs.BasicMessage,       action_basicMessage_Command);
-        packetActions.Add(PacketIDs.ConnectToServer,    action_ConnectServer);
-        packetActions.Add(PacketIDs.Instantiate_Players, action_Instantiate);
-        packetActions.Add(PacketIDs.allCanMove,         action_AllCanMove);
+        packetActions.Add(PacketIDs.Move_Command,           action_Move_Command);
+        packetActions.Add(PacketIDs.Attack_Command,         action_Attack_Command);
+        packetActions.Add(PacketIDs.Select_Command,         action_Select_Command);
+        packetActions.Add(PacketIDs.Old_School_Command,     action_Old_School_Command);
+        packetActions.Add(PacketIDs.BasicMessage,           action_basicMessage_Command);
+        packetActions.Add(PacketIDs.ConnectToServer,        action_ConnectServer);
+        packetActions.Add(PacketIDs.Instantiate_Players,    action_Instantiate);
+        packetActions.Add(PacketIDs.allCanMove,             action_AllCanMove);
+
+        packetActions.Add(PacketIDs.Cmd_MyPosToServer,      action_MyPosToServer);
+        packetActions.Add(PacketIDs.Rpc_PosForAll,          action_ServerSendMeAPosition);
+
+        packetActions.Add(PacketIDs.Cmd_Shoot,              action_Shoot);
+        packetActions.Add(PacketIDs.Rpc_InstBullet,         action_instbullet);
     }
 
     // [paso 4] Crear la funcion a la cual le asignamos al Action
@@ -78,8 +97,6 @@ public class ConfigPackets {
             var index = int.Parse(_players[i].Split(',')[1]);
             PlayerSpawner.instancia.SpawnPlayer(id, index);
         }
-
-        
     }
 
     public static void AllCanMove()
@@ -125,4 +142,39 @@ public class ConfigPackets {
         Console.WriteLine(msg);
         print("recibo un mensaje " );
     }
+
+    //FUNCIONES QUE RECIBE EL SERVER
+
+    //Aca recibe la posicion de alguien y luego la manda a todos
+    public static void Server_ReceivePositionForUpdate(string id,Vector3 pos)
+    {
+        new PacketBase(PacketIDs.Rpc_PosForAll).Add(id).Add(pos).Send(false);
+    }
+
+    public static void Server_ReceiveShoot(string bulletInfo)
+    {
+        Console.WriteLine("Server: Recibí un Shoot");
+        new PacketBase(PacketIDs.Rpc_InstBullet).Add(bulletInfo).Send(false);
+    }
+
+    //FUNCIONES QUE RECIBE EL CLIENTE
+
+    //Aca el servidor me manda la posicion de alguien para que la actualice en mi pantalla
+    public static void Client_ReceivePositionForUpdate(string id, Vector3 pos)
+    {
+        MultiplayerManager.instance.players.Where(x => x.ID == int.Parse(id)).First().UpdateMyPositionFromServer(pos);
+        
+    }
+
+    public static void Client_InstShoot(string bulletInfo)
+    {
+        Console.WriteLine("Cliente: Recibí un Shoot");
+        string[] info = bulletInfo.Split('-');
+        string id = info[0];
+        Vector3 pos = new Vector3(float.Parse(info[1].Split(',')[0]), float.Parse(info[1].Split(',')[1]), float.Parse(info[1].Split(',')[2]));
+        Quaternion rot = new Quaternion(float.Parse(info[2].Split(',')[0]), float.Parse(info[2].Split(',')[1]), float.Parse(info[2].Split(',')[2]), float.Parse(info[2].Split(',')[3]));
+        MultiplayerManager.instance.players.ForEach(x => x.InstanciateBullet(pos, rot));
+
+    }
+
 }

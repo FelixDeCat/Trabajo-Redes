@@ -7,12 +7,12 @@ using System.Linq;
 public class NewPlayer : NetworkBehaviour
 {
 
-    public int ID;
+    public int id; public int ID { get { return id; } set { id = value; txt_name.text = value.ToString(); } }
 
     Rigidbody rb;
     Renderer myRender;
 
-    public bool canMove = true;
+    public bool canMove = false;
 
     public CheckIsGrounded check;
 
@@ -64,20 +64,19 @@ public class NewPlayer : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         auxFloat = speed;
 
-        if (!hasAuthority) return;
-
-        //GameManager.instancia.TheAutority = this;
-
+        if (!HasAutority) return;
+        GameManager.instancia.TheAutority = this;
         canshot = true;
         currentBullets = maxBullets;
-        GameManager.instancia.Cuadro.SetActive(false);
-        txt_name.fontSize = txt_name.fontSize / 2;
-        GameManager.instancia.pantalla_de_espera.SetActive(true);
+
+        //GameManager.instancia.Cuadro.SetActive(false);
+        //txt_name.fontSize = txt_name.fontSize / 2;
+        //GameManager.instancia.pantalla_de_espera.SetActive(true);
     }
 
     void FixedUpdate()
     {
-        //if (!hasAuthority) return;
+        if (!HasAutority) return;
         if (canMove)
         {
             Jump();
@@ -103,7 +102,6 @@ public class NewPlayer : NetworkBehaviour
 
     float _time; float paso = 2f;
     Vector3 lastPosition;
-    int asd;
     public void Move()
     {
         movevetical = transform.forward * Input.GetAxis("Vertical") * speed;
@@ -111,19 +109,14 @@ public class NewPlayer : NetworkBehaviour
         Vector3 movement = movehorizontal + movevetical + moveFall + extraVector;
         rb.velocity = movement;
 
-        if (_time < paso)
-        {
-            _time = _time + 1 * Time.deltaTime;
-        }
-        else
-        {
-            Debug.Log("GUARDO ");
-            lastPosition = movement;
-            _time = 0;
-        }
+        if (_time < paso) _time = _time + 1 * Time.deltaTime;
+        else { lastPosition = movement; _time = 0; }
 
-        asd++;
-        if (movement != lastPosition) new PacketBase(PacketIDs.BasicMessage).Add("HOla" + asd).Send();
+        if (movement != lastPosition)
+            new PacketBase(PacketIDs.Cmd_MyPosToServer)
+                .Add(ID.ToString())
+                .Add(transform.position)
+                .Send(false);
 
     }
     public void Look()
@@ -136,17 +129,15 @@ public class NewPlayer : NetworkBehaviour
     bool oneshot2;
     private void Update()
     {
-        if (isServer) RutinaTimer();
-        if (!hasAuthority) return;
+       // if (isServer) RutinaTimer();
+        if (!HasAutority) return;
         Shoot();
-        CmdCheckIfEstanTodos();
+        //CmdCheckIfEstanTodos();
     }
 
     float timerBullet;
     public void Shoot()
     {
-        if (!hasAuthority) return;
-
         canshot = currentBullets <= 0 ? false : true;
 
         if (!canshot) return;
@@ -154,8 +145,9 @@ public class NewPlayer : NetworkBehaviour
         if (Input.GetButtonDown("Fire1"))
         {
             currentBullets--;
-            
-            CmdShoot();
+
+            SendShootRequest();
+
             Invoke("AddBullet", 5f);
         }
 
@@ -163,32 +155,27 @@ public class NewPlayer : NetworkBehaviour
 
         UpdateGraphicsBullets();
     }
-    void AddBullet() { if (currentBullets < maxBullets) currentBullets++; }
-
-    void UpdateGraphicsBullets()
+    void AddBullet()
     {
+        if (currentBullets < maxBullets)
+            currentBullets++;
+    }
+    void UpdateGraphicsBullets() {
         var g1 = GameManager.instancia.bullet1.gameObject;
         var g2 = GameManager.instancia.bullet2.gameObject;
         var g3 = GameManager.instancia.bullet3.gameObject;
-
         if (currentBullets == 0) { g1.SetActive(false); g2.SetActive(false); g3.SetActive(false); }
         if (currentBullets == 1) { g1.SetActive(true); g2.SetActive(false); g3.SetActive(false); }
         if (currentBullets == 2) { g1.SetActive(true); g2.SetActive(true); g3.SetActive(false); }
         if (currentBullets == 3) { g1.SetActive(true); g2.SetActive(true); g3.SetActive(true); }
-
     }
-
-    void RutinaTimer()
-    {
-        if (timerGo)
-        {
-            if (timer >= 0)
-            {
+    void RutinaTimer() {
+        if (timerGo) {
+            if (timer >= 0) {
                 timer = timer - 1 * Time.deltaTime;
                 CmdEnviarElTimerATodos(((int)timer).ToString());
             }
-            else
-            {
+            else {
                 FindObjectOfType<NetworkManager>().ServerChangeScene("Game scene");
                 timerGo = false;
                 timer = 0;
@@ -196,17 +183,25 @@ public class NewPlayer : NetworkBehaviour
         }
     }
 
-    private void OnDestroy() { if(!hasAuthority)  if(GameManager.instancia.pantalla_de_espera != null) GameManager.instancia.pantalla_de_espera.SetActive(false); }
+    private void OnDestroy() {
+        if (!hasAuthority)
+            if (GameManager.instancia.pantalla_de_espera != null)
+                GameManager.instancia.pantalla_de_espera.SetActive(false);
+    }
 
-    void Respawn()
-    {
-        transform.position = mySpawnPosition; Console.WriteLine("Estoy spawneando");
+    void Respawn() {
+        transform.position = mySpawnPosition;
+        Console.WriteLine("Estoy spawneando");
         extraVector = Vector3.zero;
     }
 
     void Dead()
     {
-        if (transform.position.y < y_pos_to_death) { Console.WriteLine("Spawneo por muerte"); Respawn(); }
+        if (transform.position.y < y_pos_to_death)
+        {
+            Console.WriteLine("Spawneo por muerte");
+            Respawn();
+        }
     }
 
     void CanMove()
@@ -225,22 +220,14 @@ public class NewPlayer : NetworkBehaviour
     /// CMD 
     //////////////////////////////////// 
 
-    [Command]
-    public void CmdEmpuje(int index, Vector3 dir)
-    {
+    [Command] public void CmdEmpuje(int index, Vector3 dir) {
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         var player = allPlayers.Where(x => x.index == index).First();
         player.RpcEmpuje(dir);
     }
-
-    [Command]
-    public void CmdMensaje(string s)
-    {
-        RpcMensaje(s);
-    }
+    [Command] public void CmdMensaje(string s) { RpcMensaje(s); }
     bool oneshot;
-    [Command]
-    void CmdCheckIfEstanTodos()
+    [Command] void CmdCheckIfEstanTodos()
     {
         var count = NetworkServer.connections.Count;
         if (!oneshot)
@@ -255,30 +242,33 @@ public class NewPlayer : NetworkBehaviour
         }
 
     }
-    [Command]
-    void CmdEnviarElTimerATodos(string s)
+    [Command] void CmdEnviarElTimerATodos(string s)
     {
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarTimer(s));
     }
-    [Command]
-    void CmdShoot()
+    [Command] void CmdShoot()
     {
         var bl = Instantiate(GameManager.instancia.bullet, bullet_spawn_point.position, transform.rotation);
         NetworkServer.Spawn(bl);
     }
 
-    [Command]
-    public void CmdLlegoALaMeta(int index)
+    void SendShootRequest()
+    {
+        Console.WriteLine("Enviando ShootRequest can shoot" + canshot);
+        string info = ID + "-" + bullet_spawn_point.position + "-" + transform.rotation;
+        new PacketBase(PacketIDs.Cmd_Shoot).Add(info).Send();
+    }
+    
+
+    [Command] public void CmdLlegoALaMeta(int index)
     {
         Console.WriteLine(index + "llego a la Meta");
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarGanador("El ganador es el \nPlayer " + index));
         timerGo = true;
     }
-
-    [Command]
-    public void CmdRealizarAccion(int p, int accion, float param)
+    [Command] public void CmdRealizarAccion(int p, int accion, float param)
     {
         Console.WriteLine("Recibo accion del cliente");
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
@@ -290,22 +280,14 @@ public class NewPlayer : NetworkBehaviour
     /// RPC
     //////////////////////////////////// 
 
-    [ClientRpc]
-    void RpcPintarme(Vector3 v3)
-    {
+    [ClientRpc] void RpcPintarme(Vector3 v3) {
         GetComponent<MeshRenderer>().materials[0].color = new Color(v3.x, v3.y, v3.z);
     }
-
     bool oneshotJump;
-    [ClientRpc]
-    void RpcRealizarAccion(int index, float param)
-    {
+    [ClientRpc] void RpcRealizarAccion(int index, float param) {
         if (!hasAuthority) return;
-
         Console.WriteLine("Realizando accion: (" + index + ")");
-
         Console.WriteLine("Primero vale :" + speed.ToString());
-
         switch (index)
         {
             case 1:
@@ -329,59 +311,56 @@ public class NewPlayer : NetworkBehaviour
                 break;
         }
     }
-
     void Reset_Buffs()
     {
         speed = auxFloat;
         canshot = true;
         oneshotJump = false;
     }
-
-    [ClientRpc]
-    public void RpcMostrarTimer(string s)
+    [ClientRpc] public void RpcMostrarTimer(string s)
     {
         GameManager.instancia.Cuadro.SetActive(true);
         GameManager.instancia.txt_timer.text = s;
     }
-    [ClientRpc]
-    public void RpcEmpuje(Vector3 dir)
+    [ClientRpc] public void RpcEmpuje(Vector3 dir)
     {
         extraVector = dir * 5;
         Invoke("ResetExtraVector", 2f);
     }
     void ResetExtraVector() { extraVector = Vector3.zero; }
-    [ClientRpc]
-    public void RpcCanMove()
+    [ClientRpc] public void RpcCanMove()
     {
         GameManager.instancia.pantalla_de_espera.SetActive(false);
         canMove = true;
     }
     public void Receive_CanMove()
     {
-        if (HasAutority)
-        {
-            Console.WriteLine("Yo: " + ID + " puedo moverme");
-            canMove = true;
-        }
+        Console.WriteLine("Yo: " + ID + " puedo moverme");
+        canMove = true;
     }
 
-    [ClientRpc]//Lo recibe el cliente desde el server
-    public void RpcMensaje(string s) { Console.WriteLine(s); }
-    [ClientRpc]
-    public void RpcSetInitialData(Vector3 t, int i, string s)
+    [ClientRpc] public void RpcMensaje(string s) { Console.WriteLine(s); }
+    [ClientRpc] public void RpcSetInitialData(Vector3 _position, int _index, string _name)
     {
-        Console.WriteLine("mi data es: " + t + " Index: " + i);
-        index = i;
-        player_name = s;
+        Console.WriteLine("mi data es: " + _position + " Index: " + _index);
+        index = _index;
+        player_name = _name;
         txt_name.text = player_name;
-        mySpawnPosition = t;
+        mySpawnPosition = _position;
         Respawn();
     }
-    [ClientRpc]
-    public void RpcMostrarGanador(string s)
+    [ClientRpc] public void RpcMostrarGanador(string s)
     {
         GameManager.instancia.anim_mensaje.Animar(s);
     }
+
+
+    public void InstanciateBullet(Vector3 pos, Quaternion rot)
+    {
+        Instantiate(GameManager.instancia.bullet, pos, rot);
+    }
+
+    public void UpdateMyPositionFromServer(Vector3 pos) { if(!HasAutority) transform.position = pos; }
 }
 
 

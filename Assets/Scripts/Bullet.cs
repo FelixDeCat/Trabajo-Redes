@@ -1,21 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using UnityEngine;
 public class Bullet : MonoBehaviour {
+	void Start () { Destroy(gameObject, 3); }
+	void Update () { transform.position += transform.forward * 35 * Time.deltaTime; }
+    void OnTriggerEnter(Collider other) {
 
-
-	void Start () {
-        Destroy(gameObject, 3);
-	}
-	
-	void Update () {
-        transform.position += transform.forward * 35 * Time.deltaTime;
-	}
-
-    void OnTriggerEnter(Collider other)
-    {
-        var pl = other.GetComponent<Player>();
+        var pl = other.GetComponent<NewPlayer>();
 
         if(!pl.hasAuthority)
         {

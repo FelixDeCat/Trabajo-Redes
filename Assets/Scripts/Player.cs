@@ -64,7 +64,7 @@ public class Player : NetworkBehaviour
 
         if (!hasAuthority) return;
 
-        GameManager.instancia.TheAutority = this;
+        //GameManager.instancia.TheAutority = this;
 
         canshot = true;
         currentBullets = maxBullets;
