@@ -200,6 +200,8 @@ public class NewPlayer : NetworkBehaviour
         }
     }
 
+    public bool HasAutority { get { return MultiplayerManager.connectionID == this.ID; } }
+
     //////////////////////////////////// 
     /// CMD 
     //////////////////////////////////// 
@@ -335,6 +337,15 @@ public class NewPlayer : NetworkBehaviour
         GameManager.instancia.pantalla_de_espera.SetActive(false);
         canMove = true;
     }
+    public void Receive_CanMove()
+    {
+        if (HasAutority)
+        {
+            Console.WriteLine("Yo: " + ID + " puedo moverme");
+            canMove = true;
+        }
+    }
+
     [ClientRpc]//Lo recibe el cliente desde el server
     public void RpcMensaje(string s) { Console.WriteLine(s); }
     [ClientRpc]

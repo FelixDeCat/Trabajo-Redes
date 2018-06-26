@@ -24,6 +24,7 @@ public enum PacketIDs : short
     Select_Command,
     Old_School_Command,
     BasicMessage,
+    allCanMove,
     Count
 }
 
@@ -42,6 +43,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
     public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer((int)x.floatInfo[0]);
     public static Action<PacketBase> action_Instantiate =           x => InstantiateClients(x.stringInfo[0]);
+    public static Action<PacketBase> action_AllCanMove =            x => AllCanMove();
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -55,6 +57,7 @@ public class ConfigPackets {
         packetActions.Add(PacketIDs.BasicMessage,       action_basicMessage_Command);
         packetActions.Add(PacketIDs.ConnectToServer,    action_ConnectServer);
         packetActions.Add(PacketIDs.Instantiate_Players, action_Instantiate);
+        packetActions.Add(PacketIDs.allCanMove,         action_AllCanMove);
     }
 
     // [paso 4] Crear la funcion a la cual le asignamos al Action
@@ -65,20 +68,26 @@ public class ConfigPackets {
     public static void InstantiateClients(string players)
     {
         PlayerSpawner.instancia.FindAndDestroyGameObjects();
-        Console.WriteLine("Voy a instanciar: " + players.Length + " Players");
 
         var _players = players.Split('-');
+
+        Console.WriteLine("Voy a instanciar: " + _players.Length + " Players");
 
         for (int i = 0; i < _players.Length; i++) {
             var id = int.Parse(_players[i].Split(',')[0]);
             var index = int.Parse(_players[i].Split(',')[1]);
             PlayerSpawner.instancia.SpawnPlayer(id, index);
         }
-        
 
         
-
     }
+
+    public static void AllCanMove()
+    {
+        Console.WriteLine("All Can Move");
+        MultiplayerManager.instance.players.ForEach(x => x.Receive_CanMove());
+    }
+
     public static void ConnectToServer(int _id)
     {
         Console.WriteLine("On Packet Received");

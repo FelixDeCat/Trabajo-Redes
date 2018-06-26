@@ -51,7 +51,7 @@ public class MultiplayerManager : MonoBehaviour {
     public void PlayerConnected(int id)
     {
         players.Add(PlayerSpawner.instancia.SpawnPlayer(id));
-        PlayerSpawner.instancia.InitGame();
+        PlayerSpawner.instancia.CheckPlayers();
         Console.WriteLine("El player " + id + " se ha conectado");
     }
 
