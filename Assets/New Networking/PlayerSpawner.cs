@@ -8,6 +8,11 @@ public class PlayerSpawner : MonoBehaviour
     public static PlayerSpawner instancia;
     private void Awake() { instancia = this; }
 
+    private void Update()
+    {
+        
+    }
+
     public NewPlayer SpawnPlayer(int id) {
         GameObject go = Instantiate(model);
         go.transform.localPosition = new Vector3(0, 0, 0);

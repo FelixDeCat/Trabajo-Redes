@@ -77,7 +77,7 @@ public class NewPlayer : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!hasAuthority) return;
+        //if (!hasAuthority) return;
         if (canMove)
         {
             Jump();
@@ -100,12 +100,31 @@ public class NewPlayer : NetworkBehaviour
         else if (inputJump == 0 && Grounded()) { moveFall.y = 0;  if (oneshotJump) { oneshotJump = false;  moveFall.y = jumpForce * 3; } }
         else { moveFall.y -= gravity; }
     }
+
+    float _time; float paso = 2f;
+    Vector3 lastPosition;
+    int asd;
     public void Move()
     {
         movevetical = transform.forward * Input.GetAxis("Vertical") * speed;
         movehorizontal = transform.right * Input.GetAxis("Horizontal") * speed;
         Vector3 movement = movehorizontal + movevetical + moveFall + extraVector;
         rb.velocity = movement;
+
+        if (_time < paso)
+        {
+            _time = _time + 1 * Time.deltaTime;
+        }
+        else
+        {
+            Debug.Log("GUARDO ");
+            lastPosition = movement;
+            _time = 0;
+        }
+
+        asd++;
+        if (movement != lastPosition) new PacketBase(PacketIDs.BasicMessage).Add("HOla" + asd).Send();
+
     }
     public void Look()
     {
