@@ -67,7 +67,7 @@ public class ConfigPackets {
         var id = int.Parse(players.Split(',')[0]);
         var index = int.Parse(players.Split(',')[1]);
 
-        Login.instancia.SpawnPlayer(id,index);
+        PlayerSpawner.instancia.SpawnPlayer(id,index);
 
     }
     public static void ConnectToServer(int _id)

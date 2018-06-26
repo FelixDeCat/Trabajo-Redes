@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Login : MonoBehaviour
+public class PlayerSpawner : MonoBehaviour
 {
     public GameObject model;
 
-    public static Login instancia;
+    public static PlayerSpawner instancia;
     private void Awake() { instancia = this; }
 
     public NewPlayer SpawnPlayer(int id)
