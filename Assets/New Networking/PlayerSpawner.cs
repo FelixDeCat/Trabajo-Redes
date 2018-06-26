@@ -43,14 +43,24 @@ public class PlayerSpawner : MonoBehaviour
 
             var players = MultiplayerManager.instance.players;
 
-            string[] col = new string[players.Count]; 
+            string col = "";
 
             for (int i = 0; i < players.Count; i++)
             {
                 var spawn = GameManager.instancia.spawnpoint[i];
                 players[i].transform.position = spawn.position;
-                col[i] = players[i].ID + "," + i;
+
+                if (i == players.Count - 1)
+                {
+                    col += players[i].ID + "," + i;
+                }
+                else
+                {
+                    col += players[i].ID + "," + i + "-";
+                }
             }
+
+            Console.WriteLine("la col es: " + col);
 
             new PacketBase(PacketIDs.Instantiate_Players).Add(col).Send();
         }
