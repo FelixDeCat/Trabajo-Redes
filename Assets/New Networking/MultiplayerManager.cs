@@ -39,13 +39,13 @@ public class MultiplayerManager : MonoBehaviour {
         myClient = new NetworkClient();
         AddPacketActions();
         myClient.Connect("127.0.0.1", 8080);
-
+        connectionID = UnityEngine.Random.Range(0, 1000);
         Invoke("ConectClient", 0.1f);
     }
 
     //si soy cliente envio mi conection ID
     void ConectClient() {
-        new PacketBase(PacketIDs.ConnectToServer).Add((float)UnityEngine.Random.Range(0,1000)).Send();
+        new PacketBase(PacketIDs.ConnectToServer).Add((float)connectionID).Send();
     }
 
     public void PlayerConnected(int id)

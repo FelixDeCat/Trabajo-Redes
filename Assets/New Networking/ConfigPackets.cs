@@ -41,7 +41,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
     public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer((int)x.floatInfo[0]);
-    public static Action<PacketBase> action_Instantiate =           x => InstantiateClients(x.stringInfo[0]);
+    public static Action<PacketBase> action_Instantiate =           x => InstantiateClients(x.stringInfo);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -62,12 +62,18 @@ public class ConfigPackets {
     ///////////////////////////////////////////////////////////////////////////////////
     /// TODAS LAS FUNCIONES QUE VAN A EJECUTAR LOS ACTIONS CUANDO RECIBO UN PACKET
     ///////////////////////////////////////////////////////////////////////////////////
-    public static void InstantiateClients(string players)
+    public static void InstantiateClients(string[] players)
     {
-        var id = int.Parse(players.Split(',')[0]);
-        var index = int.Parse(players.Split(',')[1]);
+        PlayerSpawner.instancia.FindAndDestroyGameObjects();
+        Console.WriteLine("Voy a instanciar: " + players.Length + " Players");
+        for (int i = 0; i < players.Length; i++) {
+            var id = int.Parse(players[i].Split(',')[0]);
+            var index = int.Parse(players[i].Split(',')[1]);
+            PlayerSpawner.instancia.SpawnPlayer(id, index);
+        }
+        
 
-        PlayerSpawner.instancia.SpawnPlayer(id,index);
+        
 
     }
     public static void ConnectToServer(int _id)

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class CustomCamera : MonoBehaviour
 {
@@ -10,12 +11,17 @@ public class CustomCamera : MonoBehaviour
     public bool follow;
     private NewPlayer _player;
 
+    bool optimize;
+
     void LateUpdate()
     {
         if (target == null)
         {
-            _player = FindObjectOfType<NewPlayer>();
+            var col = FindObjectsOfType<NewPlayer>().Where(x => x.ID == MultiplayerManager.connectionID).ToList();
+            if (col.Count == 0) return;
+            _player = col.First();
             if (_player) target = _player.gameObject;
+            optimize = true;
             return;
         }
 

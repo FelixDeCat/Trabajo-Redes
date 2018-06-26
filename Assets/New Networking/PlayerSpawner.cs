@@ -20,6 +20,11 @@ public class PlayerSpawner : MonoBehaviour
         return player;
     }
 
+    public void FindAndDestroyGameObjects() {
+        var todestroy = FindObjectsOfType<NewPlayer>();
+        for (int i = 0; i < todestroy.Length; i++) Destroy(todestroy[i].gameObject);
+    }
+
     public void SpawnPlayer(int id, int pos)
     {
         GameObject go = Instantiate(model);
@@ -37,13 +42,17 @@ public class PlayerSpawner : MonoBehaviour
             Console.WriteLine("Iniciando Juego....");
 
             var players = MultiplayerManager.instance.players;
+
+            string[] col = new string[players.Count]; 
+
             for (int i = 0; i < players.Count; i++)
             {
                 var spawn = GameManager.instancia.spawnpoint[i];
                 players[i].transform.position = spawn.position;
-
-                new PacketBase(PacketIDs.Instantiate_Players).Add(players[i].ID +","+ i).Send();
+                col[i] = players[i].ID + "," + i;
             }
+
+            new PacketBase(PacketIDs.Instantiate_Players).Add(col).Send();
         }
     }
 }
