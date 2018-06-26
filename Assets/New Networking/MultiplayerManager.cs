@@ -46,12 +46,12 @@ public class MultiplayerManager : MonoBehaviour {
     //si soy cliente envio mi conection ID
     void ConectClient() {
         Console.WriteLine("ConectClient");
-        new PacketBase(PacketIDs.ConnectToServer).Add("Connection ID: " + myClient.connection.connectionId).Send();
+        new PacketBase(PacketIDs.ConnectToServer).Add((float)myClient.connection.connectionId).Send();
     }
 
-    public void PlayerConnected(string id)
+    public void PlayerConnected(int id)
     {
-        players.Add(Login.instancia.SpawnPlayer(int.Parse(id)));
+        players.Add(Login.instancia.SpawnPlayer(id));
         Login.instancia.InitGame();
         Console.WriteLine("El player " + id + " se ha conectado");
 

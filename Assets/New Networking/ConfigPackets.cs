@@ -40,7 +40,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Select_Command =        x => SelectCommand(x.stringInfo);
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
-    public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer(x.stringInfo[0]);
+    public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer((int)x.floatInfo[0]);
     //public static Action<PacketBase> action_Instantiate =           x => ;
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
@@ -78,7 +78,7 @@ public class ConfigPackets {
         }
 
     }
-    public static void ConnectToServer(string _id)
+    public static void ConnectToServer(int _id)
     {
         Console.WriteLine("On Packet Received");
         GameObject.FindObjectOfType<MultiplayerManager>().PlayerConnected(_id);
