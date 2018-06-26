@@ -45,8 +45,7 @@ public class MultiplayerManager : MonoBehaviour {
 
     //si soy cliente envio mi conection ID
     void ConectClient() {
-        Console.WriteLine("ConectClient");
-        new PacketBase(PacketIDs.ConnectToServer).Add((float)myClient.connection.connectionId).Send();
+        new PacketBase(PacketIDs.ConnectToServer).Add((float)UnityEngine.Random.Range(0,1000)).Send();
     }
 
     public void PlayerConnected(int id)
@@ -54,17 +53,6 @@ public class MultiplayerManager : MonoBehaviour {
         players.Add(Login.instancia.SpawnPlayer(id));
         Login.instancia.InitGame();
         Console.WriteLine("El player " + id + " se ha conectado");
-
-        //string[] playersSerializados = new string[players.Count];
-        //for (int i = 0; i < playersSerializados.Length; i++)
-        //{
-        //    playersSerializados[i] = players[i].ID + 
-        //}
-
-        //new PacketBase(PacketIDs.Instantiate_Players).Add(id)
-
-        new PacketBase(PacketIDs.BasicMessage).Add("A TODOS").Send();
-        
     }
 
     void AddPacketActions()

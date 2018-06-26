@@ -41,7 +41,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
     public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer((int)x.floatInfo[0]);
-    //public static Action<PacketBase> action_Instantiate =           x => ;
+    public static Action<PacketBase> action_Instantiate =           x => InstantiateClients(x.stringInfo[0]);
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -54,6 +54,7 @@ public class ConfigPackets {
         packetActions.Add(PacketIDs.Old_School_Command, action_Old_School_Command);
         packetActions.Add(PacketIDs.BasicMessage,       action_basicMessage_Command);
         packetActions.Add(PacketIDs.ConnectToServer,    action_ConnectServer);
+        packetActions.Add(PacketIDs.Instantiate_Players, action_Instantiate);
     }
 
     // [paso 4] Crear la funcion a la cual le asignamos al Action
@@ -61,21 +62,12 @@ public class ConfigPackets {
     ///////////////////////////////////////////////////////////////////////////////////
     /// TODAS LAS FUNCIONES QUE VAN A EJECUTAR LOS ACTIONS CUANDO RECIBO UN PACKET
     ///////////////////////////////////////////////////////////////////////////////////
-    public static void InstantiateClients(string[] players)
+    public static void InstantiateClients(string players)
     {
-        List<int> ids = new List<int>();
-        List<int> pos = new List<int>();
+        var id = int.Parse(players.Split(',')[0]);
+        var index = int.Parse(players.Split(',')[1]);
 
-        for (int i = 0; i < players.Length; i++)
-        {
-            ids.Add(int.Parse(players[i].Split(',')[0]));
-            pos.Add(int.Parse(players[i].Split(',')[1]));
-        }
-
-        for (int j = 0; j < ids.Count; j++)
-        {
-            Login.instancia.SpawnPlayer(ids[j],pos[j]);
-        }
+        Login.instancia.SpawnPlayer(id,index);
 
     }
     public static void ConnectToServer(int _id)

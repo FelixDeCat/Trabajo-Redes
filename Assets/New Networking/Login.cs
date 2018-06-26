@@ -41,6 +41,8 @@ public class Login : MonoBehaviour
             {
                 var spawn = GameManager.instancia.spawnpoint[i];
                 players[i].transform.position = spawn.position;
+
+                new PacketBase(PacketIDs.Instantiate_Players).Add(players[i].ID +","+ i).Send();
             }
         }
     }
