@@ -17,6 +17,7 @@ using UnityEngine.Networking;
 // [paso 1] Agregar el enum
 public enum PacketIDs : short
 {
+    Instantiate_Players,
     ConnectToServer,
     Move_Command,
     Attack_Command,
@@ -40,6 +41,7 @@ public class ConfigPackets {
     public static Action<PacketBase> action_Old_School_Command =    x => Move(x.stringInfo[0]);
     public static Action<PacketBase> action_basicMessage_Command =  x => BasicMessageCommand(x.stringInfo[0]);
     public static Action<PacketBase> action_ConnectServer =         x => ConnectToServer(x.stringInfo[0]);
+    //public static Action<PacketBase> action_Instantiate =           x => ;
 
     // [paso 3] Rellenar el Diccionario con el Enum y el Action
     public void Config_PacketActions()
@@ -59,6 +61,23 @@ public class ConfigPackets {
     ///////////////////////////////////////////////////////////////////////////////////
     /// TODAS LAS FUNCIONES QUE VAN A EJECUTAR LOS ACTIONS CUANDO RECIBO UN PACKET
     ///////////////////////////////////////////////////////////////////////////////////
+    public static void InstantiateClients(string[] players)
+    {
+        List<int> ids = new List<int>();
+        List<int> pos = new List<int>();
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            ids.Add(int.Parse(players[i].Split(',')[0]));
+            pos.Add(int.Parse(players[i].Split(',')[1]));
+        }
+
+        for (int j = 0; j < ids.Count; j++)
+        {
+            Login.instancia.SpawnPlayer(ids[j],pos[j]);
+        }
+
+    }
     public static void ConnectToServer(string _id)
     {
         Console.WriteLine("On Packet Received");
@@ -93,6 +112,7 @@ public class ConfigPackets {
     }
     public static void BasicMessageCommand(string msg)
     {
+        Console.WriteLine(msg);
         print("recibo un mensaje " );
     }
 }

@@ -31,6 +31,8 @@ public class MultiplayerManager : MonoBehaviour {
         AddPacketActions();
         NetworkServer.Listen(8080);
         myClient = ClientScene.ConnectLocalServer();
+
+        Invoke("ConectClient", 0.1f);
     }
     public void SetupClient() {
         connectionType = ConnectionType.Client;
@@ -41,15 +43,29 @@ public class MultiplayerManager : MonoBehaviour {
         Invoke("ConectClient", 0.1f);
     }
 
+    public List<NewPlayer> players = new List<NewPlayer>(); 
+
     void ConectClient() {
         Console.WriteLine("ConectClient");
-        new PacketBase(PacketIDs.ConnectToServer).Add(connectionID.ToString()).Send();
+        new PacketBase(PacketIDs.ConnectToServer).Add(connectionID.ToString()).Send(true);
     }
 
     public void PlayerConnected(string id)
     {
+        players.Add(Login.instancia.SpawnPlayer(int.Parse(id)));
+        Login.instancia.InitGame();
         Console.WriteLine("El player " + id + " se ha conectado");
-        Debug.Log("El player " + id + " se ha conectado");
+
+        //string[] playersSerializados = new string[players.Count];
+        //for (int i = 0; i < playersSerializados.Length; i++)
+        //{
+        //    playersSerializados[i] = players[i].ID + 
+        //}
+
+        //new PacketBase(PacketIDs.Instantiate_Players).Add(id)
+
+        new PacketBase(PacketIDs.BasicMessage).Add("A TODOS").Send();
+        
     }
 
     private void OnPlayerDisconnected(NetworkPlayer player)

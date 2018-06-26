@@ -8,14 +8,13 @@ public class CustomCamera : MonoBehaviour
     public float distance;
     public float height;
     public bool follow;
-    private Player _player;
-
+    private NewPlayer _player;
 
     void LateUpdate()
     {
         if (target == null)
         {
-            _player = FindObjectOfType<Player>();
+            _player = FindObjectOfType<NewPlayer>();
             if (_player) target = _player.gameObject;
             return;
         }

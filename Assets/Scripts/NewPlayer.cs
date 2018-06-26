@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Linq;
 
-public class Player : NetworkBehaviour
+public class NewPlayer : NetworkBehaviour
 {
+
+    public int ID;
 
     Rigidbody rb;
     Renderer myRender;
@@ -22,7 +24,7 @@ public class Player : NetworkBehaviour
     public string player_name;
     public TextMesh txt_name;
 
-    public List<Player> allPlayers = new List<Player>();
+    public List<NewPlayer> allPlayers = new List<NewPlayer>();
 
     public Vector3 mySpawnPosition;
 
@@ -64,7 +66,7 @@ public class Player : NetworkBehaviour
 
         if (!hasAuthority) return;
 
-        GameManager.instancia.TheAutority = this;
+        //GameManager.instancia.TheAutority = this;
 
         canshot = true;
         currentBullets = maxBullets;
@@ -190,7 +192,7 @@ public class Player : NetworkBehaviour
 
     void CanMove()
     {
-        allPlayers = FindObjectsOfType<Player>().ToList();
+        allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcCanMove());
         for (int i = 0; i < NetworkServer.connections.Count; i++)
         {
@@ -205,7 +207,7 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdEmpuje(int index, Vector3 dir)
     {
-        allPlayers = FindObjectsOfType<Player>().ToList();
+        allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         var player = allPlayers.Where(x => x.index == index).First();
         player.RpcEmpuje(dir);
     }
@@ -225,7 +227,7 @@ public class Player : NetworkBehaviour
             oneshot = true;
             if (count >= 2)
             {
-                allPlayers = FindObjectsOfType<Player>().ToList();
+                allPlayers = FindObjectsOfType<NewPlayer>().ToList();
                 allPlayers.ForEach(x => x.RpcPintarme(new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f))));
                 Invoke("CanMove", 0.5f);
             }
@@ -235,7 +237,7 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdEnviarElTimerATodos(string s)
     {
-        allPlayers = FindObjectsOfType<Player>().ToList();
+        allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarTimer(s));
     }
     [Command]
@@ -249,7 +251,7 @@ public class Player : NetworkBehaviour
     public void CmdLlegoALaMeta(int index)
     {
         Console.WriteLine(index + "llego a la Meta");
-        allPlayers = FindObjectsOfType<Player>().ToList();
+        allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarGanador("El ganador es el \nPlayer " + index));
         timerGo = true;
     }
@@ -258,7 +260,7 @@ public class Player : NetworkBehaviour
     public void CmdRealizarAccion(int p, int accion, float param)
     {
         Console.WriteLine("Recibo accion del cliente");
-        allPlayers = FindObjectsOfType<Player>().ToList();
+        allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         var player = allPlayers.Where(x => x.index == p).First();
         player.RpcRealizarAccion(accion, param);
     }
@@ -350,4 +352,11 @@ public class Player : NetworkBehaviour
     {
         GameManager.instancia.anim_mensaje.Animar(s);
     }
+}
+
+
+public static class extensions
+{
+    public static UnityEngine.UI.Graphic pintar(this UnityEngine.UI.Graphic g) { g.color = Color.white; return g; }
+    public static UnityEngine.UI.Graphic despintar(this UnityEngine.UI.Graphic g) { g.color = Color.grey; return g; }
 }
