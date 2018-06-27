@@ -150,11 +150,14 @@ public class ConfigPackets {
     {
         new PacketBase(PacketIDs.Rpc_PosForAll).Add(id).Add(pos).Send(false);
     }
-
     public static void Server_ReceiveShoot(string bulletInfo)
     {
         Console.WriteLine("Server: Recibí un Shoot");
         new PacketBase(PacketIDs.Rpc_InstBullet).Add(bulletInfo).Send(false);
+    }
+    public static void Server_ReceivePowerUpAction(string act)
+    {
+       
     }
 
     //FUNCIONES QUE RECIBE EL CLIENTE
@@ -165,7 +168,6 @@ public class ConfigPackets {
         MultiplayerManager.instance.players.Where(x => x.ID == int.Parse(id)).First().UpdateMyPositionFromServer(pos);
         
     }
-
     public static void Client_InstShoot(string bulletInfo)
     {
         string[] info = bulletInfo.Split('_');

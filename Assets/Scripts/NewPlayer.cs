@@ -330,6 +330,34 @@ public class NewPlayer : NetworkBehaviour
                 break;
         }
     }
+
+    public void RealizarAccion(int index, float param)
+    {
+        Console.WriteLine("me llego" + index +" con param " + param);
+
+        switch (index)
+        {
+            case 1:
+                speed = speed + param;
+                Invoke("Reset_Buffs", 2.5f);
+                break;
+            case 2:
+                speed = speed - param;
+                Invoke("Reset_Buffs", 2.5f);
+                break;
+            case 3:
+                canshot = false;
+                var g1 = GameManager.instancia.bullet1.gameObject;
+                var g2 = GameManager.instancia.bullet2.gameObject;
+                var g3 = GameManager.instancia.bullet3.gameObject;
+                g1.SetActive(false); g2.SetActive(false); g3.SetActive(false);
+                Invoke("Reset_Buffs", 2f);
+                break;
+            case 4:
+                if (!oneshotJump) oneshotJump = true;
+                break;
+        }
+    }
     void Reset_Buffs()
     {
         speed = auxFloat;

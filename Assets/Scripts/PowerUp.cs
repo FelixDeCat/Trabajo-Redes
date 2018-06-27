@@ -20,13 +20,22 @@ public class PowerUp : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        var player = other.gameObject.GetComponent<Player>();
+        Console.WriteLine("Lo colisiono alguien: power Up =>" + buff.ToString());
+
+        var player = other.gameObject.GetComponent<NewPlayer>();
+
+        Console.WriteLine("Lo colisiono alguien: power Up =>" + buff.ToString());
 
         if (player != null) {
 
-            if (player.hasAuthority)
+            Console.WriteLine("Player no es null");
+
+            if (player.HasAutority)
             {
-                player.CmdRealizarAccion(player.index, (int)buff + 1, veltoModify);
+                Console.WriteLine("Player Tiene autoridad");
+
+                // player.CmdRealizarAccion(player.ID, (int)buff + 1, veltoModify);
+                player.RealizarAccion((int)buff + 1, veltoModify);
                 myCol.enabled = false;
                 gopart.SetActive(false);
                 Invoke("Reactivar", 7.5f);
