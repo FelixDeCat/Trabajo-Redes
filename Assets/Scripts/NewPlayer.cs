@@ -96,7 +96,7 @@ public class NewPlayer : NetworkBehaviour
     {
         inputJump = Input.GetAxisRaw("Jump");
         if (inputJump > 0 && Grounded()) { moveFall.y = jumpForce; }
-        else if (inputJump == 0 && Grounded()) { moveFall.y = 0;  if (oneshotJump) { oneshotJump = false;  moveFall.y = jumpForce * 3; } }
+        else if (inputJump == 0 && Grounded()) { moveFall.y = 0; if (oneshotJump) { oneshotJump = false; moveFall.y = jumpForce * 3; } }
         else { moveFall.y -= gravity; }
     }
 
@@ -129,7 +129,7 @@ public class NewPlayer : NetworkBehaviour
     bool oneshot2;
     private void Update()
     {
-       // if (isServer) RutinaTimer();
+        // if (isServer) RutinaTimer();
         if (!HasAutority) return;
         Shoot();
         //CmdCheckIfEstanTodos();
@@ -160,7 +160,8 @@ public class NewPlayer : NetworkBehaviour
         if (currentBullets < maxBullets)
             currentBullets++;
     }
-    void UpdateGraphicsBullets() {
+    void UpdateGraphicsBullets()
+    {
         var g1 = GameManager.instancia.bullet1.gameObject;
         var g2 = GameManager.instancia.bullet2.gameObject;
         var g3 = GameManager.instancia.bullet3.gameObject;
@@ -169,13 +170,17 @@ public class NewPlayer : NetworkBehaviour
         if (currentBullets == 2) { g1.SetActive(true); g2.SetActive(true); g3.SetActive(false); }
         if (currentBullets == 3) { g1.SetActive(true); g2.SetActive(true); g3.SetActive(true); }
     }
-    void RutinaTimer() {
-        if (timerGo) {
-            if (timer >= 0) {
+    void RutinaTimer()
+    {
+        if (timerGo)
+        {
+            if (timer >= 0)
+            {
                 timer = timer - 1 * Time.deltaTime;
                 CmdEnviarElTimerATodos(((int)timer).ToString());
             }
-            else {
+            else
+            {
                 FindObjectOfType<NetworkManager>().ServerChangeScene("Game scene");
                 timerGo = false;
                 timer = 0;
@@ -183,13 +188,15 @@ public class NewPlayer : NetworkBehaviour
         }
     }
 
-    private void OnDestroy() {
+    private void OnDestroy()
+    {
         if (!hasAuthority)
             if (GameManager.instancia.pantalla_de_espera != null)
                 GameManager.instancia.pantalla_de_espera.SetActive(false);
     }
 
-    void Respawn() {
+    void Respawn()
+    {
         transform.position = mySpawnPosition;
         Console.WriteLine("Estoy spawneando");
         extraVector = Vector3.zero;
@@ -220,14 +227,18 @@ public class NewPlayer : NetworkBehaviour
     /// CMD 
     //////////////////////////////////// 
 
-    [Command] public void CmdEmpuje(int index, Vector3 dir) {
+    [Command]
+    public void CmdEmpuje(int index, Vector3 dir)
+    {
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         var player = allPlayers.Where(x => x.index == index).First();
         player.RpcEmpuje(dir);
     }
-    [Command] public void CmdMensaje(string s) { RpcMensaje(s); }
+    [Command]
+    public void CmdMensaje(string s) { RpcMensaje(s); }
     bool oneshot;
-    [Command] void CmdCheckIfEstanTodos()
+    [Command]
+    void CmdCheckIfEstanTodos()
     {
         var count = NetworkServer.connections.Count;
         if (!oneshot)
@@ -242,12 +253,14 @@ public class NewPlayer : NetworkBehaviour
         }
 
     }
-    [Command] void CmdEnviarElTimerATodos(string s)
+    [Command]
+    void CmdEnviarElTimerATodos(string s)
     {
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarTimer(s));
     }
-    [Command] void CmdShoot()
+    [Command]
+    void CmdShoot()
     {
         var bl = Instantiate(GameManager.instancia.bullet, bullet_spawn_point.position, transform.rotation);
         NetworkServer.Spawn(bl);
@@ -256,19 +269,21 @@ public class NewPlayer : NetworkBehaviour
     void SendShootRequest()
     {
         Console.WriteLine("Enviando ShootRequest can shoot" + canshot);
-        string info = ID + "-" + bullet_spawn_point.position + "-" + transform.rotation;
+        string info = ID + "_" + bullet_spawn_point.position.ToCleanString() + "_" + transform.rotation.ToCleanString();
         new PacketBase(PacketIDs.Cmd_Shoot).Add(info).Send();
     }
-    
 
-    [Command] public void CmdLlegoALaMeta(int index)
+
+    [Command]
+    public void CmdLlegoALaMeta(int index)
     {
         Console.WriteLine(index + "llego a la Meta");
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
         allPlayers.ForEach(x => x.RpcMostrarGanador("El ganador es el \nPlayer " + index));
         timerGo = true;
     }
-    [Command] public void CmdRealizarAccion(int p, int accion, float param)
+    [Command]
+    public void CmdRealizarAccion(int p, int accion, float param)
     {
         Console.WriteLine("Recibo accion del cliente");
         allPlayers = FindObjectsOfType<NewPlayer>().ToList();
@@ -280,11 +295,15 @@ public class NewPlayer : NetworkBehaviour
     /// RPC
     //////////////////////////////////// 
 
-    [ClientRpc] void RpcPintarme(Vector3 v3) {
+    [ClientRpc]
+    void RpcPintarme(Vector3 v3)
+    {
         GetComponent<MeshRenderer>().materials[0].color = new Color(v3.x, v3.y, v3.z);
     }
     bool oneshotJump;
-    [ClientRpc] void RpcRealizarAccion(int index, float param) {
+    [ClientRpc]
+    void RpcRealizarAccion(int index, float param)
+    {
         if (!hasAuthority) return;
         Console.WriteLine("Realizando accion: (" + index + ")");
         Console.WriteLine("Primero vale :" + speed.ToString());
@@ -303,7 +322,7 @@ public class NewPlayer : NetworkBehaviour
                 var g1 = GameManager.instancia.bullet1.gameObject;
                 var g2 = GameManager.instancia.bullet2.gameObject;
                 var g3 = GameManager.instancia.bullet3.gameObject;
-                g1.SetActive(false); g2.SetActive(false); g3.SetActive(false); 
+                g1.SetActive(false); g2.SetActive(false); g3.SetActive(false);
                 Invoke("Reset_Buffs", 2f);
                 break;
             case 4:
@@ -317,18 +336,21 @@ public class NewPlayer : NetworkBehaviour
         canshot = true;
         oneshotJump = false;
     }
-    [ClientRpc] public void RpcMostrarTimer(string s)
+    [ClientRpc]
+    public void RpcMostrarTimer(string s)
     {
         GameManager.instancia.Cuadro.SetActive(true);
         GameManager.instancia.txt_timer.text = s;
     }
-    [ClientRpc] public void RpcEmpuje(Vector3 dir)
+    [ClientRpc]
+    public void RpcEmpuje(Vector3 dir)
     {
         extraVector = dir * 5;
         Invoke("ResetExtraVector", 2f);
     }
     void ResetExtraVector() { extraVector = Vector3.zero; }
-    [ClientRpc] public void RpcCanMove()
+    [ClientRpc]
+    public void RpcCanMove()
     {
         GameManager.instancia.pantalla_de_espera.SetActive(false);
         canMove = true;
@@ -339,8 +361,10 @@ public class NewPlayer : NetworkBehaviour
         canMove = true;
     }
 
-    [ClientRpc] public void RpcMensaje(string s) { Console.WriteLine(s); }
-    [ClientRpc] public void RpcSetInitialData(Vector3 _position, int _index, string _name)
+    [ClientRpc]
+    public void RpcMensaje(string s) { Console.WriteLine(s); }
+    [ClientRpc]
+    public void RpcSetInitialData(Vector3 _position, int _index, string _name)
     {
         Console.WriteLine("mi data es: " + _position + " Index: " + _index);
         index = _index;
@@ -349,7 +373,8 @@ public class NewPlayer : NetworkBehaviour
         mySpawnPosition = _position;
         Respawn();
     }
-    [ClientRpc] public void RpcMostrarGanador(string s)
+    [ClientRpc]
+    public void RpcMostrarGanador(string s)
     {
         GameManager.instancia.anim_mensaje.Animar(s);
     }
@@ -360,7 +385,7 @@ public class NewPlayer : NetworkBehaviour
         Instantiate(GameManager.instancia.bullet, pos, rot);
     }
 
-    public void UpdateMyPositionFromServer(Vector3 pos) { if(!HasAutority) transform.position = pos; }
+    public void UpdateMyPositionFromServer(Vector3 pos) { if (!HasAutority) transform.position = pos; }
 }
 
 
@@ -368,4 +393,7 @@ public static class extensions
 {
     public static UnityEngine.UI.Graphic pintar(this UnityEngine.UI.Graphic g) { g.color = Color.white; return g; }
     public static UnityEngine.UI.Graphic despintar(this UnityEngine.UI.Graphic g) { g.color = Color.grey; return g; }
+
+    public static string ToCleanString(this Vector3 v) { return v.x.ToString() + "," + v.y.ToString() + "," + v.z.ToString(); }
+    public static string ToCleanString(this Quaternion q) { return q.x.ToString() + "," + q.y.ToString() + "," + q.z.ToString() + "," + q.w.ToString(); }
 }

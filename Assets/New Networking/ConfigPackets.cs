@@ -168,12 +168,19 @@ public class ConfigPackets {
 
     public static void Client_InstShoot(string bulletInfo)
     {
-        Console.WriteLine("Cliente: Recibí un Shoot");
-        string[] info = bulletInfo.Split('-');
+        string[] info = bulletInfo.Split('_');
+        Console.WriteLine("Info " + bulletInfo);
         string id = info[0];
-        Vector3 pos = new Vector3(float.Parse(info[1].Split(',')[0]), float.Parse(info[1].Split(',')[1]), float.Parse(info[1].Split(',')[2]));
+        Console.WriteLine("ID " + id);
+        Vector3 pos = new Vector3(
+            float.Parse(info[1].Split(',')[0]), 
+            float.Parse(info[1].Split(',')[1]), 
+            float.Parse(info[1].Split(',')[2]));
+        Console.WriteLine("POS " + pos);
         Quaternion rot = new Quaternion(float.Parse(info[2].Split(',')[0]), float.Parse(info[2].Split(',')[1]), float.Parse(info[2].Split(',')[2]), float.Parse(info[2].Split(',')[3]));
-        MultiplayerManager.instance.players.ForEach(x => x.InstanciateBullet(pos, rot));
+        Console.WriteLine("Rot " + rot);
+        Console.WriteLine("Client<" + id +">" + " Pos: " + pos + " Rot: " + rot);
+        GameManager.instancia.TheAutority.InstanciateBullet(pos, rot);
 
     }
 
