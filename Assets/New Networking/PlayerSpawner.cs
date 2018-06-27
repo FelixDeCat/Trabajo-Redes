@@ -26,7 +26,7 @@ public class PlayerSpawner : MonoBehaviour
         var spawn = GameManager.instancia.spawnpoint[pos];
         go.transform.localPosition = spawn.position;
         NewPlayer player = go.GetComponent<NewPlayer>();
-        player.mySpawnPosition = spawn.position;
+        player. mySpawnPosition = spawn.position;
         player.ID = id;
 
         MultiplayerManager.instance.players.Add(player);
