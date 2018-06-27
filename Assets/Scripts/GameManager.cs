@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     public LayerMask layer_Player;
     public LayerMask layer_Floor;
     public LayerMask layer_Enemy;
+    public Transform casifinal;
 
     public NewPlayer TheAutority;
 

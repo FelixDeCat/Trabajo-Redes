@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Meta : MonoBehaviour {
+public class CheckPoint : MonoBehaviour {
 
 
     private void OnTriggerEnter(Collider other) {
@@ -12,7 +12,8 @@ public class Meta : MonoBehaviour {
 
         if (player != null)
         {
-            new PacketBase(PacketIDs.Cmd_ReciveWinner).Add(player.ID.ToString()).Send();
+            player.mySpawnPosition = this.transform.position;
+            player.mySpawnRotation = this.transform.rotation;
         }
     }
 }

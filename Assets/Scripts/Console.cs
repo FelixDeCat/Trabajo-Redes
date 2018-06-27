@@ -7,5 +7,8 @@ public class Console : MonoBehaviour {
         instancia = this;
         console = this.gameObject.GetComponent<Text>();
     }
-    public static void WriteLine(string s) { console.text += "\n" + s; }
+    public static void WriteLine(string s)
+    {
+        //console.text += "\n" + s;
+    }
 }

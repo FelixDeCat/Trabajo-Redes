@@ -6,9 +6,12 @@ public class Bullet : MonoBehaviour {
 
         var pl = other.GetComponent<NewPlayer>();
 
-        if(!pl.hasAuthority)
+        if(!pl.HasAutority)
         {
-            GameManager.instancia.TheAutority.CmdEmpuje(pl.index, this.gameObject.transform.forward); 
+            new PacketBase(PacketIDs.Cmd_BulletCollision)
+                .Add(pl.ID.ToString())
+                .Add(this.gameObject.transform.forward)
+                .Send();
         }
         
         Destroy(gameObject);
